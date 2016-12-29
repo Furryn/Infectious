@@ -9,6 +9,8 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = CoreReference.GAME_NAME;
+		config.height = 540;
+		config.width = 960;
 		new LwjglApplication(new Infectious(), config);
 	}
 }

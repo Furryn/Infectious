@@ -2,25 +2,21 @@ package com.grutschus.infectious;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.grutschus.infectious.actors.Player;
 import com.grutschus.infectious.input.InputHandler;
 
 public class Infectious extends ApplicationAdapter {
 	private static Stage stage;
-	private static Viewport viewport;
-	
+
 	@Override
 	public void create () {
-		SpriteBatch batch = new SpriteBatch();
-		Camera camera = new OrthographicCamera();
-		viewport = new FitViewport(CoreReference.GAMEWORLD_WIDTH, CoreReference.GAMEWORLD_HEIGHT, camera);
-		stage = new Stage(viewport, batch);
+		Viewport viewport = new FitViewport(CoreReference.GAMEWORLD_HEIGHT * CoreReference.ASPECT_RATIO, CoreReference.GAMEWORLD_HEIGHT);
+		stage = new Stage(viewport);
+		stage.addActor(new Player());
 
 		Gdx.input.setInputProcessor(new InputHandler());
 	}
@@ -40,6 +36,6 @@ public class Infectious extends ApplicationAdapter {
 
 	@Override
 	public void resize(int width, int height) {
-		viewport.update(width, height);
+		stage.getViewport().update(width, height, true);
 	}
 }
