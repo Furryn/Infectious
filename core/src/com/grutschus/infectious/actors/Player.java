@@ -1,7 +1,6 @@
 package com.grutschus.infectious.actors;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.grutschus.infectious.CoreReference;
@@ -9,32 +8,43 @@ import com.sun.istack.internal.NotNull;
 
 public class Player extends Actor {
 
-    private ShapeRenderer shapeRenderer;
     private float vel = CoreReference.Player.PLAYER_VEL;
+    private float rotation = 0;
     private Vector2 direction = new Vector2();
+    private Vector2 mousePosition = new Vector2();
+    private Vector2 tempVec2 = new Vector2();
+    private Animation<TextureRegion> walkingAnimation;
+    private float animationTimer = 0f;
 
     public Player() {
         setSize(CoreReference.Player.PLAYER_SIZE_X, CoreReference.Player.PLAYER_SIZE_Y);
         setOrigin(getWidth() / 2, getHeight() / 2);
         setPosition(CoreReference.CENTER_X, CoreReference.CENTER_Y);
 
-        shapeRenderer = new ShapeRenderer();
+        TextureAtlas walkingAnimationAtlas = new TextureAtlas(CoreReference.Assets.ANIMATION_WALKING);
+        walkingAnimation = new Animation<TextureRegion>(0.25f, walkingAnimationAtlas.findRegions("player"), Animation.PlayMode.LOOP);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.end();
-        shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(getX() - getWidth() / 2, getY() - getHeight() / 2, getWidth(), getHeight());
-        shapeRenderer.setColor(1, 1, 1, 1);
-        shapeRenderer.end();
-        batch.begin();
+        Sprite currentFrame = new Sprite(walkingAnimation.getKeyFrame(animationTimer, true));
+        currentFrame.setRotation(rotation);
+        currentFrame.setOrigin(getOriginX(), getOriginY());
+        currentFrame.setPosition(getX(), getY());
+        currentFrame.setSize(getWidth(), getHeight());
+        currentFrame.draw(batch);
     }
 
     @Override
     public void act(float delta) {
         moveBy(vel * direction.x * delta, vel * direction.y * delta);
+
+        if (!direction.equals(Vector2.Zero)) // Only animate when moving
+            animationTimer = (animationTimer + delta) % 1; // Prevents timer from going to infinity.
+
+        tempVec2 = mousePosition.cpy();
+        tempVec2.sub(getX() + getOriginX(), getY() + getOriginY()); // Calculate a Vector pointing from Mouse to Player
+        rotation = tempVec2.angle();
     }
 
     /**
@@ -82,4 +92,10 @@ public class Player extends Actor {
     public Vector2 getDirection() {
         return direction;
     }
+
+    public void setMousePosition(Vector2 v)
+    {
+        mousePosition = v.cpy();
+    }
+
 }

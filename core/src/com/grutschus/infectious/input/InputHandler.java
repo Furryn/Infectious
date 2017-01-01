@@ -1,7 +1,10 @@
 package com.grutschus.infectious.input;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.grutschus.infectious.CoreReference;
 import com.grutschus.infectious.Infectious;
 import com.grutschus.infectious.actors.Player;
 
@@ -112,7 +115,13 @@ public class InputHandler implements InputProcessor {
 
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
-        return false;
+        try {
+            if (player == null) initPlayer();
+            player.setMousePosition(convertFromScreenToWorldCoords(screenX, screenY));
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     @Override
@@ -128,5 +137,11 @@ public class InputHandler implements InputProcessor {
             }
         }
         throw new IllegalStateException("Could not find a player object in stage. Player might not have been added to stage yet!");
+    }
+
+    private Vector2 convertFromScreenToWorldCoords(float x, float y) {
+        float scrX = (x / Gdx.graphics.getWidth()) * CoreReference.GAMEWORLD_WIDTH;
+        float scrY = (1 - (y / Gdx.graphics.getHeight())) * CoreReference.GAMEWORLD_HEIGHT;
+        return new Vector2(scrX, scrY);
     }
 }
